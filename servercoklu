@@ -1,0 +1,53 @@
+import socket
+
+SERVER_IP = "10.242.45.23"
+PORT = 9000
+
+def main():
+    print("\n--- ÇOKLU SİMÜLASYON KONTROL MERKEZİ ---")
+    print("Örnek komutlar:")
+    print("  1 arm")
+    print("  1 takeoff")
+    print("  2 arm")
+    print("  2 takeoff")
+    print("  all arm")
+    print("  q (çıkış)\n")
+
+    try:
+        # 🔗 SERVER'A TEK BAĞLANTI
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((SERVER_IP, PORT))
+        print("✅ Server'a bağlanıldı")
+
+        while True:
+            cmd = input("Komut gir: ").strip().lower()
+
+            if not cmd:
+                continue
+
+            if cmd == "q":
+                s.sendall(b"EXIT")
+                print("❌ Çıkılıyor")
+                break
+
+            # 👉 KOMUTU SERVER FORMATINA ÇEVİR ("1 arm" → "1-ARM")
+            if " " in cmd:
+                parts = cmd.split(" ", 1)
+                drone_id = parts[0]
+                command = parts[1].upper()
+                formatted_cmd = f"{drone_id}-{command}"
+            else:
+                formatted_cmd = cmd.upper()
+            
+            print(f"📤 Gönderiliyor: {formatted_cmd}")
+            s.sendall(formatted_cmd.encode("utf-8"))
+
+    except Exception as e:
+        print("❌ Bağlantı hatası:", e)
+
+    finally:
+        if s:
+            s.close()
+
+if __name__ == "__main__":
+    main()
