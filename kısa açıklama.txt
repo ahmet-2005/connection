@@ -1,0 +1,113 @@
+---
+
+# ZeroTier Üzerinden İstemci–Sunucu Haberleşmesi
+
+## 1. Amaç
+
+İki bağımsız bilgisayarın internet üzerinden güvenli şekilde haberleşmesini sağlamak.
+Port açmadan, NAT problemi yaşamadan bağlantı kurmak için ZeroTier VPN kullanılmıştır.
+
+---
+
+# 2. Kullanılan Bileşenler
+
+## 2.1 ZeroTier VPN
+
+Amaç: İki cihazı aynı sanal yerel ağdaymış gibi göstermek.
+
+Kullanım adımları:
+
+1. ZeroTier kurulumu yapılır.
+2. Aynı Network ID’ye katılım sağlanır:
+
+   ```
+   zerotier-cli join NETWORK_ID
+   ```
+3. ZeroTier Central üzerinden cihazlar “Auth” edilir.
+4. Her cihaz bir 10.x.x.x IP adresi alır.
+5. Bu IP adresleri üzerinden haberleşme yapılır.
+
+---
+
+## 2.2 Sunucu Kodu
+
+Kullanılan dosya:
+`benim kod.py` 
+
+Görevi:
+
+* TCP soketi oluşturur.
+* 12345 portunda dinleme yapar.
+* Gelen bağlantıyı kabul eder.
+* Mesaj gönderip alır.
+
+Çalıştırma:
+
+```
+python benim kod.py
+```
+
+Sunucu tarafında çalıştırılır.
+
+---
+
+## 2.3 İstemci Kodu
+
+Kullanılan dosya:
+`arkadaş kod.py` 
+
+Görevi:
+
+* Kullanıcıdan IP adresi ister.
+* Belirtilen IP ve 12345 portuna bağlanır.
+* Mesaj gönderip alır.
+
+Çalıştırma:
+
+```
+python arkadaş kod.py
+```
+
+İstemci tarafında çalıştırılır.
+
+---
+
+# 3. Çalışma Mantığı
+
+1. Sunucu bilgisayar ZeroTier IP’sini öğrenir (örnek: 10.242.45.23).
+2. Sunucu `benim kod.py` ile dinlemeye başlar.
+3. İstemci `arkadaş kod.py` çalıştırılır.
+4. İstemciye sunucunun ZeroTier IP’si girilir.
+5. TCP bağlantısı kurulur.
+6. Karşılıklı mesajlaşma başlar.
+
+---
+
+# 4. Kullanılmayan Dosyalar
+
+* Rapor dosyaları (dokümantasyon amaçlıdır)  
+* `vehicle.py` (bu senaryoda kullanılmamıştır)
+
+---
+
+# 5. Teknik Özellikler
+
+* Protokol: TCP
+* Port: 12345
+* Ağ Katmanı: ZeroTier Sanal Ağ
+* Mimari: Client–Server
+* İletişim: UTF-8 encoded metin mesajlaşma
+
+---
+
+# 6. Sonuç
+
+Bu yapı ile:
+
+* Port yönlendirme yapılmadan
+* Firewall ayarları değiştirilmeden
+* Güvenli sanal ağ üzerinden
+
+iki bilgisayar arasında TCP tabanlı haberleşme sağlanmıştır.
+
+---
